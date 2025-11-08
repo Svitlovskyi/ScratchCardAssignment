@@ -84,7 +84,6 @@ public enum ScratchCardAction {
     case scratch
     case cancelScratching
     case activate
-    case reset
 }
 
 // MARK: - ViewModel Implementation
@@ -92,10 +91,16 @@ public enum ScratchCardAction {
 final class ScratchCardViewModel: BaseViewModel<ScratchCardAction, ScratchCardViewState> {
     private let activateCardUseCase: ActivateCardUseCaseProtocol
     private var scratchTask: Task<Void, Never>?
+    private var activationTask: Task<Void, Never>?
 
     init(activateCardUseCase: ActivateCardUseCaseProtocol) {
         self.activateCardUseCase = activateCardUseCase
         super.init(initialState: ScratchCardViewState())
+    }
+
+    deinit {
+        scratchTask?.cancel()
+        activationTask?.cancel()
     }
 
     var isScratching: Bool {
@@ -121,9 +126,8 @@ final class ScratchCardViewModel: BaseViewModel<ScratchCardAction, ScratchCardVi
         case .cancelScratching:
             handleCancelScratching()
         case .activate:
-            Task { await handleActivate() }
-        case .reset:
-            handleReset()
+            activationTask?.cancel()
+            activationTask = Task { await handleActivate() }
         }
     }
     
@@ -134,7 +138,7 @@ final class ScratchCardViewModel: BaseViewModel<ScratchCardAction, ScratchCardVi
         
         scratchTask = Task {
             do {
-                try await Task.sleep(nanoseconds: 2_000_000_000)
+                try await Task.sleep(nanoseconds: AppConstants.Animation.scratchDurationNanoseconds)
                 
                 guard !Task.isCancelled else {
                     state.scratching = .idle
@@ -156,18 +160,22 @@ final class ScratchCardViewModel: BaseViewModel<ScratchCardAction, ScratchCardVi
         state.scratching = .idle
     }
     
-    private func handleReset() {
-        handleCancelScratching()
-        state = ScratchCardViewState()
-    }
-    
     private func handleActivate() async {
         guard state.cardPhase.canBeActivated, let code = state.cardPhase.code else { return }
-        
+
+        if case .error = state.activation {
+            state.activation = .idle
+        }
+
         state.activation = .loading
-        
+
         let result = await activateCardUseCase.execute(code: code)
-        
+
+        guard !Task.isCancelled else {
+            state.activation = .idle
+            return
+        }
+
         switch result {
         case .success:
             state.cardPhase = .activated(code: code)
