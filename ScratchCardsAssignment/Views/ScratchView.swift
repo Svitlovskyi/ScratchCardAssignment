@@ -102,21 +102,13 @@ struct ScratchView: View {
     }
 
     private var controlsView: some View {
-        Button(action: {
-            viewModel.perform(.scratch)
-        }) {
-            HStack {
-                Image(systemName: viewModel.isScratching ? "hourglass" : "hand.tap")
-                Text(viewModel.isScratching ? "Scratching..." : "Scratch Card")
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(buttonColor)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-        }
-        .disabled(!viewModel.state.canBeScratched || viewModel.isScratching)
-        .padding(.horizontal)
+        PrimaryButton(
+            title: viewModel.isScratching ? "Scratching..." : "Scratch Card",
+            icon: viewModel.isScratching ? "hourglass" : "hand.tap",
+            color: .blue,
+            isEnabled: viewModel.state.canBeScratched && !viewModel.isScratching,
+            action: { viewModel.perform(.scratch) }
+        )
     }
 
     @ViewBuilder
@@ -130,13 +122,6 @@ struct ScratchView: View {
 
     private var cardGradientColors: [Color] {
         [Color.blue.opacity(0.6), Color.purple.opacity(0.6)]
-    }
-
-    private var buttonColor: Color {
-        if !viewModel.state.canBeScratched || viewModel.isScratching {
-            return .gray
-        }
-        return .blue
     }
 }
 

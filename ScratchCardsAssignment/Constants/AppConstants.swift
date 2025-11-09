@@ -13,5 +13,6 @@ enum AppConstants {
         static let cardHeightPercentage: CGFloat = 0.8
         static let cardCornerRadius: CGFloat = 20
         static let cardShadowRadius: CGFloat = 10
+        static let buttonCornerRadius: CGFloat = 10
     }
 }

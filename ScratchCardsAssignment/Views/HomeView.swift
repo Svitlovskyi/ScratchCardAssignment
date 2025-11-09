@@ -81,33 +81,23 @@ struct HomeView: View {
     }
 
     private var scratchButton: some View {
-        Button(action: { showScratchView = true }) {
-            HStack {
-                Image(systemName: "hand.draw")
-                Text("Go to Scratch Screen")
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-        }
-        .disabled(!viewModel.state.canBeScratched && viewModel.state.cardPhase != .unscratched)
+        PrimaryButton(
+            title: "Go to Scratch Screen",
+            icon: "hand.draw",
+            color: .blue,
+            isEnabled: viewModel.state.canBeScratched || viewModel.state.cardPhase == .unscratched,
+            action: { showScratchView = true }
+        )
     }
 
     private var activationButton: some View {
-        Button(action: { showActivationView = true }) {
-            HStack {
-                Image(systemName: "checkmark.seal")
-                Text("Go to Activation Screen")
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(activationButtonColor)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-        }
-        .disabled(!viewModel.state.canBeActivated)
+        PrimaryButton(
+            title: "Go to Activation Screen",
+            icon: "checkmark.seal",
+            color: .green,
+            isEnabled: viewModel.state.canBeActivated,
+            action: { showActivationView = true }
+        )
     }
 
     private var stateIcon: String {
@@ -130,10 +120,6 @@ struct HomeView: View {
         case .activated:
             return .green
         }
-    }
-
-    private var activationButtonColor: Color {
-        viewModel.state.canBeActivated ? .green : .gray
     }
 
     private var errorBinding: Binding<Bool> {

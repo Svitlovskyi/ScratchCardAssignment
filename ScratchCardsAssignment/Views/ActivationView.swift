@@ -110,21 +110,13 @@ struct ActivationView: View {
     }
 
     private var controlsView: some View {
-        Button(action: {
-            viewModel.perform(.activate)
-        }) {
-            HStack {
-                Image(systemName: viewModel.isActivating ? "hourglass" : "checkmark.seal.fill")
-                Text(viewModel.isActivating ? "Activating..." : "Activate Card")
-            }
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(buttonColor)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-        }
-        .disabled(!viewModel.state.canBeActivated || viewModel.isActivating)
-        .padding(.horizontal)
+        PrimaryButton(
+            title: viewModel.isActivating ? "Activating..." : "Activate Card",
+            icon: viewModel.isActivating ? "hourglass" : "checkmark.seal.fill",
+            color: .green,
+            isEnabled: viewModel.state.canBeActivated && !viewModel.isActivating,
+            action: { viewModel.perform(.activate) }
+        )
     }
 
     @ViewBuilder
@@ -147,13 +139,6 @@ struct ActivationView: View {
             return [Color.green.opacity(0.6), Color.teal.opacity(0.6)]
         }
         return [Color.orange.opacity(0.6), Color.red.opacity(0.6)]
-    }
-
-    private var buttonColor: Color {
-        if !viewModel.state.canBeActivated || viewModel.isActivating {
-            return .gray
-        }
-        return .green
     }
 }
 

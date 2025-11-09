@@ -3,3 +3,4 @@ ToDo Improvements:
 - [ ] DI 
 - [ ] Localization
 - [ ] Design system
+- [ ] ViewModel Unit Test coverage
