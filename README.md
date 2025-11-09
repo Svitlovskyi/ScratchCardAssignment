@@ -1,5 +1,5 @@
 ToDo Improvements: 
-- [] UI Tests
-- [] DI 
-- [] Localization
-- [] Design system
+- [ ] UI Tests
+- [ ] DI 
+- [ ] Localization
+- [ ] Design system
